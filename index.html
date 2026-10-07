@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AMUN Member Tasks</title>
+<style>
+:root{color-scheme:light;--bg:#f3f6fb;--surface:#fff;--ink:#17243a;--muted:#718096;--line:#e3e9f2;--blue:#315fe8;--green:#138a62;--amber:#a86308}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 88% 0%,#e3ebff 0,transparent 35%),var(--bg);color:var(--ink);line-height:1.55}
+button,input,textarea{font:inherit}
+header{position:relative;overflow:hidden;background:linear-gradient(115deg,#101d38,#1d3564);color:#fff;padding:25px max(24px,calc((100vw - 1100px)/2))}
+header:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;right:12%;top:-170px;background:#749aff22}
+header h1{position:relative;z-index:1;margin:0;font-size:25px;letter-spacing:-.035em}
+header p{position:relative;z-index:1;margin:5px 0 0;color:#b9c8e2;font-size:14px}
+.container{width:min(1100px,100%);margin:30px auto;padding:0 22px}
+.card{background:var(--surface);border:1px solid #e8edf4;border-radius:17px;padding:25px;box-shadow:0 12px 34px #1d315012;margin-bottom:20px}
+.login-box{max-width:440px;margin:9vh auto;padding:32px}
+h2{margin:0 0 8px;font-size:21px;letter-spacing:-.025em}p{margin:8px 0 15px}
+.small{color:var(--muted);font-size:13px}
+input,textarea{width:100%;padding:12px 14px;margin:7px 0;border:1px solid #d9e1ec;border-radius:10px;background:#fff;color:var(--ink);font-size:15px;transition:border-color .15s ease,box-shadow .15s ease}
+input::placeholder{color:#9aa7b8}input:focus,textarea:focus{outline:0;border-color:#6e91f4;box-shadow:0 0 0 4px #315fe81c}
+button{border:1px solid transparent;padding:10px 15px;border-radius:10px;cursor:pointer;font-weight:650;transition:transform .16s ease,background .16s ease,box-shadow .16s ease}
+button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 16px #132a501c}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #315fe850;outline-offset:2px}
+button:disabled{opacity:.55;cursor:not-allowed}
+.primary{background:var(--blue);color:#fff}.primary:hover:not(:disabled){background:#244fd0}
+.success{background:var(--green);color:#fff}.success:hover:not(:disabled){background:#0d7452}
+.secondary{background:#eef2f8;color:#273650;border-color:#e1e7f0}.secondary:hover:not(:disabled){background:#e3eaf5}
+.login-button{width:100%;margin-top:12px;padding:12px}
+.error{color:#c53c45;margin-top:12px}.hidden{display:none!important}
+.top-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:20px}
+.stat{min-width:0;background:linear-gradient(145deg,#f8faff,#f2f6fd);border:1px solid #e7edf7;border-radius:14px;padding:16px 18px;color:#66758c;font-size:13px;font-weight:650}
+.stat strong{display:block;font-size:29px;line-height:1.2;letter-spacing:-.04em;margin-top:6px;color:#24395f}
+#pendingCount{color:var(--amber)}#doneCount{color:var(--green)}
+.task-list{display:grid;gap:11px;margin-top:14px}
+.task{border:1px solid var(--line);border-radius:13px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:15px;transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+.task:hover{border-color:#c8d5ef;box-shadow:0 7px 20px #1d31500c;transform:translateY(-1px)}
+.task.done{background:#f6fcf9;border-color:#d8eee4}.task-name{font-weight:700;font-size:16px;letter-spacing:-.015em}.task-email{color:var(--muted);font-size:13px;margin-top:3px;word-break:break-word}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;font-size:11px;letter-spacing:.04em;font-weight:750;margin-top:8px}
+.badge:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pending{background:#fff4dc;color:#96600a}.done-badge{background:#e4f7ed;color:#14734e}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.modal{position:fixed;inset:0;z-index:5;background:#0b1736a6;backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-content{background:#fff;width:min(740px,100%);max-height:90vh;overflow-y:auto;border:1px solid #e3e9f2;border-radius:18px;padding:27px;box-shadow:0 24px 80px #07142b55}
+textarea{min-height:260px;resize:vertical;font-family:inherit;line-height:1.6}
+.field-label{font-size:12px;font-weight:750;color:#52627a;margin-top:14px;display:block}
+.details{background:#f5f8fd;border:1px solid #e7edf6;border-radius:12px;padding:15px;margin:16px 0}
+.details strong{color:#52627a;font-size:13px}.details span{font-size:14px}
+.button-row{display:flex;gap:9px;margin-top:15px;flex-wrap:wrap}
+@media(max-width:640px){header{padding:21px 20px}.container{padding:0 15px;margin:22px auto}.card{padding:19px;border-radius:14px}.login-box{padding:24px;margin:7vh auto}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:24px}.task{align-items:flex-start;padding:14px;flex-direction:column}.actions,.actions button{width:100%}.button-row button{flex:1 1 100%}.modal-content{padding:21px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><h1>AMUN Task Menu</h1><p id="headerSubtitle">Sign in to view your assigned tasks</p></header>
+
+<div id="loginScreen" class="container">
+  <div class="card login-box">
+    <h2>Member Login</h2>
+    <p>Sign in using the email and password for your Supabase member account.</p>
+    <form id="loginForm">
+      <input id="email" type="email" autocomplete="username" placeholder="Account email" required>
+      <input id="password" type="password" autocomplete="current-password" placeholder="Password" required>
+      <button class="primary login-button" type="submit">Login</button>
+    </form>
+    <div id="loginError" class="error" role="alert"></div>
+  </div>
+</div>
+
+<main id="appScreen" class="container hidden">
+  <section class="card">
+    <div class="top-row"><h2 id="memberName">Member</h2><button class="secondary" id="logoutButton">Sign out</button></div>
+    <p>Your assigned delegates are shown below. Only tasks assigned to your member account are visible.</p>
+    <div class="stats">
+      <div class="stat">Total<strong id="totalCount">0</strong></div>
+      <div class="stat">Pending<strong id="pendingCount">0</strong></div>
+      <div class="stat">Done<strong id="doneCount">0</strong></div>
+    </div>
+  </section>
+  <section class="card">
+    <div class="top-row"><h2>My Tasks</h2><button class="secondary" id="refreshButton">Refresh</button></div>
+    <div id="taskList" class="task-list"></div>
+    <div id="taskError" class="error" role="alert"></div>
+  </section>
+</main>
+
+<div id="emailModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-content">
+    <h2 id="modalTitle">Email Delegate</h2>
+    <div class="details"><strong>Recipient:</strong> <span id="modalRecipient"></span><br><br><strong>Name:</strong> <span id="modalDelegateName"></span></div>
+    <label class="field-label" for="emailSubject">Subject</label>
+    <input id="emailSubject" type="text">
+    <label class="field-label" for="emailBody">Email Body</label>
+    <textarea id="emailBody"></textarea>
+    <div class="button-row">
+      <button class="primary" id="composeButton">Compose in Gmail</button>
+      <button class="success" id="markSentButton">I have sent this email</button>
+      <button class="secondary" id="cancelButton">Cancel</button>
+    </div>
+    <p class="small">Gmail opens a draft for you to review and send. Mark it sent only after you have sent it.</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+const SUPABASE_URL = window.AMUN_SUPABASE_CONFIG?.url || "";
+const SUPABASE_ANON_KEY = window.AMUN_SUPABASE_CONFIG?.anonKey || "";
+const EMAIL_TEMPLATE = {
+  subject: "AMUN Registration – Important Information",
+  body: `Dear {{name}},
+
+I hope you are doing well.
+
+We are contacting you regarding your AMUN registration.
+
+Please review the required information and make sure that all necessary details have been completed.
+
+If you have any questions, please feel free to contact us.
+
+Regards,
+AMUN Registration Team`
+};
+
+let supabaseClient;
+let currentMember = null;
+let currentTasks = [];
+let currentTask = null;
+
+function showError(elementId, message) {
+  document.getElementById(elementId).textContent = message || "";
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+}
+
+function clientReady() {
+  if (!window.supabase || !SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.startsWith("YOUR_") || SUPABASE_ANON_KEY.startsWith("YOUR_")) {
+    showError("loginError", "Set the Supabase Project URL and anon/publishable key in supabase-config.js before using the member portal.");
+    return false;
+  }
+  return true;
+}
+
+async function findCurrentMember(user) {
+  const { data, error } = await supabaseClient
+    .from("team_members").select("member_no,display_name")
+    .eq("auth_user_id", user.id).maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error("This Supabase account is not linked to a team member. Ask the admin to link it in Developer 24.");
+  return { id: data.member_no, name: data.display_name, user };
+}
+
+async function startMemberSession(user) {
+  currentMember = await findCurrentMember(user);
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("appScreen").classList.remove("hidden");
+  document.getElementById("memberName").textContent = currentMember.name;
+  document.getElementById("headerSubtitle").textContent = `${currentMember.name} • AMUN Registration Tasks`;
+  await loadTasks();
+}
+
+async function login(event) {
+  event.preventDefault();
+  showError("loginError", "");
+  if (!clientReady()) return;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) {
+    showError("loginError", error.message);
+    return;
+  }
+  try {
+    await startMemberSession(data.user);
+  } catch (memberError) {
+    await supabaseClient.auth.signOut();
+    showError("loginError", memberError.message);
+    document.getElementById("loginScreen").classList.remove("hidden");
+    document.getElementById("appScreen").classList.add("hidden");
+  }
+}
+
+async function loadTasks() {
+  if (!currentMember) return;
+  showError("taskError", "");
+  const { data, error } = await supabaseClient.from("registrations")
+    .select("id,full_name,email,email_sent,email_sent_at")
+    .eq("assigned_member_id", currentMember.id).order("id", { ascending: true });
+  if (error) {
+    showError("taskError", `Unable to load your tasks: ${error.message}`);
+    return;
+  }
+  currentTasks = data || [];
+  renderTasks();
+}
+
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  const done = currentTasks.filter(task => task.email_sent).length;
+  document.getElementById("totalCount").textContent = currentTasks.length;
+  document.getElementById("doneCount").textContent = done;
+  document.getElementById("pendingCount").textContent = currentTasks.length - done;
+  if (!currentTasks.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:#6b7280">No tasks assigned yet.</div>';
+    return;
+  }
+  list.innerHTML = "";
+  for (const task of currentTasks) {
+    const element = document.createElement("article");
+    element.className = `task${task.email_sent ? " done" : ""}`;
+    const badge = task.email_sent
+      ? '<span class="badge done-badge">SENT</span>'
+      : '<span class="badge pending">PENDING</span>';
+    element.innerHTML = `<div><div class="task-name">#${escapeHtml(task.id)} — ${escapeHtml(task.full_name || "Unnamed delegate")}</div>
+      <div class="task-email">${escapeHtml(task.email || "No email")}</div>${badge}</div>
+      <div class="actions"><button class="primary" type="button">Open</button></div>`;
+    element.querySelector("button").addEventListener("click", () => openTask(task.id));
+    list.appendChild(element);
+  }
+}
+
+function openTask(id) {
+  currentTask = currentTasks.find(task => task.id === id);
+  if (!currentTask) return;
+  const name = currentTask.full_name || "Delegate";
+  const email = currentTask.email || "";
+  document.getElementById("modalTitle").textContent = `Email #${currentTask.id}`;
+  document.getElementById("modalRecipient").textContent = email || "No email available";
+  document.getElementById("modalDelegateName").textContent = name;
+  document.getElementById("emailSubject").value = EMAIL_TEMPLATE.subject
+    .replaceAll("{{name}}", name).replaceAll("{{email}}", email);
+  document.getElementById("emailBody").value = EMAIL_TEMPLATE.body
+    .replaceAll("{{name}}", name).replaceAll("{{email}}", email);
+  document.getElementById("markSentButton").disabled = Boolean(currentTask.email_sent);
+  document.getElementById("markSentButton").textContent = currentTask.email_sent ? "Already marked sent" : "I have sent this email";
+  document.getElementById("emailModal").classList.remove("hidden");
+}
+
+function openGmail() {
+  if (!currentTask) return;
+  if (!currentTask.email) {
+    alert("This registration does not contain an email address.");
+    return;
+  }
+  const params = new URLSearchParams({
+    view: "cm",
+    fs: "1",
+    to: currentTask.email,
+    su: document.getElementById("emailSubject").value,
+    body: document.getElementById("emailBody").value
+  });
+  window.open(`https://mail.google.com/mail/?${params}`, "_blank", "noopener");
+}
+
+async function markCurrentDone() {
+  if (!currentTask || currentTask.email_sent) return;
+  if (!confirm("Confirm that you have sent this email. Mark this task as sent?")) return;
+  const completedAt = new Date().toISOString();
+  const { data, error } = await supabaseClient.from("registrations")
+    .update({ email_sent: true, email_sent_at: completedAt })
+    .eq("id", currentTask.id).eq("assigned_member_id", currentMember.id)
+    .select("id").maybeSingle();
+  if (error) {
+    alert(`Could not save the sent status: ${error.message}`);
+    return;
+  }
+  if (!data) {
+    alert("The database did not confirm the update. Refresh tasks and try again.");
+    return;
+  }
+  closeModal();
+  await loadTasks();
+}
+
+function closeModal() {
+  document.getElementById("emailModal").classList.add("hidden");
+  currentTask = null;
+}
+
+async function logout() {
+  const { error } = await supabaseClient.auth.signOut();
+  if (error) {
+    alert(`Could not sign out: ${error.message}`);
+    return;
+  }
+  currentMember = null;
+  currentTasks = [];
+  document.getElementById("appScreen").classList.add("hidden");
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("password").value = "";
+  showError("loginError", "");
+}
+
+document.getElementById("loginForm").addEventListener("submit", login);
+document.getElementById("refreshButton").addEventListener("click", loadTasks);
+document.getElementById("logoutButton").addEventListener("click", logout);
+document.getElementById("composeButton").addEventListener("click", openGmail);
+document.getElementById("markSentButton").addEventListener("click", markCurrentDone);
+document.getElementById("cancelButton").addEventListener("click", closeModal);
+document.getElementById("emailModal").addEventListener("click", event => {
+  if (event.target.id === "emailModal") closeModal();
+});
+
+if (clientReady()) {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false
+    }
+  });
+  supabaseClient.auth.getSession().then(async ({ data, error }) => {
+    if (error) {
+      showError("loginError", error.message);
+      return;
+    }
+    if (!data.session?.user) return;
+    try {
+      await startMemberSession(data.session.user);
+    } catch (memberError) {
+      await supabaseClient.auth.signOut();
+      document.getElementById("loginScreen").classList.remove("hidden");
+      document.getElementById("appScreen").classList.add("hidden");
+      showError("loginError", memberError.message);
+    }
+  });
+}
+</script>
+</body>
+</html>

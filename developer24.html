@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Developer 24 — AMUN Control</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1120;--surface:#111c30;--surface-raised:#16243a;--border:#263650;--text:#edf3ff;--muted:#9aaac2;--blue:#6597ff;--green:#28bd83;--amber:#f3bb52;--red:#ff7777}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 12% 0%,#192a49 0,transparent 38%),var(--bg);color:var(--text);line-height:1.55}
+button,input,select{font:inherit}
+button{border:1px solid transparent;border-radius:10px;padding:10px 15px;cursor:pointer;font-weight:650;transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease}
+button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 7px 18px #0003}
+button:active:not(:disabled){transform:translateY(0)}
+button:disabled{opacity:.55;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #6597ff80;outline-offset:2px}
+.primary{background:var(--blue);color:#071426}.primary:hover:not(:disabled){background:#80aaff}
+.success{background:var(--green);color:#061b15}.success:hover:not(:disabled){background:#47d69e}
+.secondary{background:#1a2940;color:var(--text);border-color:#344760}.secondary:hover:not(:disabled){background:#233652}
+.container{width:min(1240px,100%);margin:auto;padding:34px 26px 64px}
+.card{background:linear-gradient(145deg,#142138,#101a2b);border:1px solid var(--border);border-radius:18px;padding:25px;margin-bottom:20px;box-shadow:0 16px 44px #0000001a}
+.login{max-width:440px;margin:10vh auto;padding:32px}
+h1,h2,h3{margin:0 0 9px;line-height:1.25;letter-spacing:-.025em}h1{font-size:clamp(27px,4vw,36px)}h2{font-size:21px}h3{font-size:17px}
+p{margin:8px 0 14px}.small{color:var(--muted);font-size:13px}
+input,select{width:100%;padding:12px 13px;margin:6px 0;border-radius:10px;border:1px solid #344760;background:#0d1728;color:var(--text);transition:border-color .15s ease,box-shadow .15s ease}
+input::placeholder{color:#70829e}input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #6597ff20;outline:0}
+label{display:block;font-size:12px;font-weight:700;letter-spacing:.025em;color:#c2cde0;margin-top:11px}
+.login .primary{width:100%;margin-top:12px;padding:12px}
+.top-row{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.top-row>div:first-child{min-width:220px}.top-row .small{margin-top:5px}
+.button-row{display:flex;gap:8px;flex-wrap:wrap}.button-row button{margin:0}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:19px 0}
+.stat{min-width:0;background:#0c1728;border:1px solid #22334d;border-radius:14px;padding:17px 19px;color:#b8c7dc;font-size:13px;font-weight:600}
+.stat-number{font-size:30px;font-weight:750;letter-spacing:-.04em;margin-top:4px;color:var(--text)}
+#totalUsers{color:#8bb1ff}#totalDone{color:#61dda9}#totalPending{color:#ffd074}
+.member-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.member-card{background:#0d1728;border:1px solid #263650;border-radius:14px;padding:18px;transition:border-color .16s ease,transform .16s ease}
+.member-card:hover{border-color:#49658d;transform:translateY(-2px)}
+.member-card h3{display:flex;align-items:center;gap:9px}.member-card h3:before{content:"";width:8px;height:8px;background:var(--blue);border-radius:50%;box-shadow:0 0 12px #6597ff80}
+.member-workload{display:flex;gap:9px;margin-top:15px}
+.workload-count{flex:1;background:#142239;border:1px solid #243753;border-radius:10px;padding:10px 12px;color:var(--muted);font-size:11px}
+.workload-count strong{display:block;font-size:20px;color:var(--text)}
+.workload-count.is-done strong{color:#6be0ac}.workload-count.is-pending strong{color:#ffd074}
+.assignment-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin:17px 0 5px}
+.assignment-toolbar select{width:min(260px,100%);margin:0}
+.registration{display:grid;grid-template-columns:minmax(180px,1fr) minmax(190px,260px);gap:18px;align-items:center;border-bottom:1px solid #263650;padding:15px 3px}
+.registration:last-child{border-bottom:0}.registration strong{font-size:14px}.registration .small{display:inline-block;margin-top:5px}.registration-status{margin-top:8px}
+.status-done,.status-pending{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:750;letter-spacing:.04em}
+.status-done{color:#6be0ac}.status-pending{color:#ffd074}
+.status-done:before,.status-pending:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.field-help{font-size:12px;color:var(--muted);margin:3px 0 8px}
+.error{color:var(--red);margin-top:10px}.notice{color:var(--amber);margin:10px 0}.hidden{display:none!important}
+#syncStatus{font-weight:600;color:#d3def0}#stagingStatus{display:inline-flex;padding:5px 10px;border-radius:999px;background:#1a2940;color:#a9c5ff}
+@media(max-width:720px){.container{padding:22px 16px 42px}.card{padding:20px;border-radius:15px}.login{margin:8vh auto;padding:25px}.top-row .button-row{width:100%}.button-row button{flex:1 1 auto}.stats{gap:9px}.stat{padding:14px}.stat-number{font-size:25px}}
+@media(max-width:520px){.registration{grid-template-columns:1fr;gap:6px;padding:16px 3px}.registration select{margin-top:3px}.stats{grid-template-columns:1fr}.stat{display:flex;justify-content:space-between;align-items:center}.stat-number{margin:0;font-size:23px}.login{margin:5vh auto}.assignment-toolbar select{width:100%}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="loginScreen" class="container">
+  <section class="card login">
+    <h1>Developer 24</h1>
+    <p class="small">Sign in with your Supabase admin account. Access is checked against the existing admin_users table.</p>
+    <form id="loginForm">
+      <input id="adminEmail" type="email" autocomplete="username" placeholder="Admin email" required>
+      <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Password" required>
+      <button class="primary" style="width:100%;margin-top:10px" type="submit">Authenticate</button>
+    </form>
+    <div id="loginError" class="error" role="alert"></div>
+  </section>
+</div>
+
+<main id="dashboard" class="container hidden">
+  <div class="top-row">
+    <div><h1>Developer 24</h1><p class="small">AMUN Task Management Control</p></div>
+    <div class="button-row">
+      <button class="success" id="fetchButton">Fetch registrations</button>
+      <button class="primary" id="assignButton">Assign round-robin</button>
+      <button class="success" id="distributeButton">Distribute to Supabase</button>
+      <button class="secondary" id="refreshButton">Refresh</button>
+      <button class="secondary" id="logoutButton">Sign out</button>
+    </div>
+  </div>
+  <section class="card">
+    <h2>System status</h2>
+    <p id="syncStatus">Sign in to load the control panel.</p>
+    <p id="stagingStatus" class="small"></p>
+    <p id="pageError" class="error" role="alert"></p>
+  </section>
+  <div class="stats">
+    <div class="stat">Total registrations<div class="stat-number" id="totalUsers">0</div></div>
+    <div class="stat">Sent<div class="stat-number" id="totalDone">0</div></div>
+    <div class="stat">Pending<div class="stat-number" id="totalPending">0</div></div>
+  </div>
+  <section class="card">
+    <h2>Team member accounts</h2>
+    <p class="small">Create each member account in Supabase Authentication first, then paste that account's User UID below. Set its password in Supabase Auth; passwords are never stored by this page.</p>
+    <div id="memberGrid" class="member-grid"></div>
+    <button id="saveMembersButton" class="primary" style="margin-top:12px">Save team settings</button>
+  </section>
+  <section class="card">
+    <div class="top-row"><div><h2>Registrations and assignments</h2>
+      <p class="small">Round-robin uses every registration's position in ID order, including sent rows: positions 1–6 go to Members 1–6, then the pattern repeats. Sent rows keep their owner and still occupy their slot, so completing work never shifts later assignments. You can adjust pending assignments before distributing.</p></div></div>
+    <div class="assignment-toolbar">
+      <span id="assignmentResultCount" class="small">Fetch registrations to view assignments.</span>
+      <select id="memberFilter" aria-label="Filter registrations by member">
+        <option value="all">All members</option>
+      </select>
+    </div>
+    <div id="assignments"></div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+const SUPABASE_URL = window.AMUN_SUPABASE_CONFIG?.url || "";
+const SUPABASE_ANON_KEY = window.AMUN_SUPABASE_CONFIG?.anonKey || "";
+const DRAFT_STORAGE_KEY = "amun-assignment-draft-v1";
+
+let supabaseClient;
+let registrations = [];
+let members = [];
+let assignmentDraft = {};
+
+function escapeHtml(value) {
+  return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+}
+
+function showError(message) {
+  document.getElementById("pageError").textContent = message || "";
+}
+
+function clientReady() {
+  if (!window.supabase || !SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.startsWith("YOUR_") || SUPABASE_ANON_KEY.startsWith("YOUR_")) {
+    document.getElementById("loginError").textContent = "Set the Supabase Project URL and anon/publishable key in supabase-config.js before using the control panel.";
+    return false;
+  }
+  return true;
+}
+
+function loadDraft() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(DRAFT_STORAGE_KEY) || "{}");
+    assignmentDraft = saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {};
+  } catch (error) {
+    console.error("Could not read the saved assignment draft.", error);
+    assignmentDraft = {};
+  }
+}
+
+function saveDraft() {
+  const safeDraft = {};
+  for (const [id, memberId] of Object.entries(assignmentDraft)) {
+    if (Number.isInteger(Number(id)) && Number.isInteger(Number(memberId)) && Number(memberId) >= 1 && Number(memberId) <= 6) {
+      safeDraft[id] = Number(memberId);
+    }
+  }
+  assignmentDraft = safeDraft;
+  localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(assignmentDraft));
+  document.getElementById("stagingStatus").textContent = `${Object.keys(assignmentDraft).length} assignment(s) staged in this browser.`;
+}
+
+async function assertAdmin() {
+  const { data, error } = await supabaseClient.rpc("is_current_user_admin");
+  if (error) throw new Error(`Admin access check failed. Run supabase_setup.sql first. ${error.message}`);
+  if (data !== true) throw new Error("This account is not listed as an authorized Supabase admin.");
+}
+
+async function showDashboard(user) {
+  await assertAdmin();
+  document.getElementById("loginScreen").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  document.getElementById("syncStatus").textContent = `Signed in as ${user.email}.`;
+  loadDraft();
+  await loadTeam();
+  await renderDashboardStats();
+  if (registrations.length) renderRegistrations();
+}
+
+async function login(event) {
+  event.preventDefault();
+  document.getElementById("loginError").textContent = "";
+  if (!clientReady()) return;
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPassword").value;
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) {
+    document.getElementById("loginError").textContent = error.message;
+    return;
+  }
+  try {
+    await showDashboard(data.user);
+  } catch (adminError) {
+    await supabaseClient.auth.signOut();
+    document.getElementById("loginError").textContent = adminError.message;
+  }
+}
+
+async function loadTeam() {
+  const { data, error } = await supabaseClient.from("team_members")
+    .select("member_no,display_name,auth_user_id").order("member_no");
+  if (error) throw new Error(`Could not load team members: ${error.message}`);
+  members = data || [];
+  renderMembers();
+  renderMemberFilter();
+}
+
+function renderMembers() {
+  const grid = document.getElementById("memberGrid");
+  grid.innerHTML = "";
+  for (const member of members) {
+    const card = document.createElement("div");
+    card.className = "member-card";
+    card.dataset.memberNo = member.member_no;
+    card.innerHTML = `<h3>${escapeHtml(member.display_name)}</h3>
+      <label>Name shown in member portal</label>
+      <input class="member-name" maxlength="80" value="${escapeHtml(member.display_name)}">
+      <label>Supabase Auth user UID</label>
+      <input class="member-uid" placeholder="Paste the member's Auth user UUID" value="${escapeHtml(member.auth_user_id || "")}">
+      <p class="field-help">Member ${member.member_no} must sign in with this Supabase Auth account.</p>
+      <div class="member-workload">
+        <div class="workload-count is-done">Done<strong data-workload-done="${member.member_no}">0</strong></div>
+        <div class="workload-count is-pending">Left<strong data-workload-pending="${member.member_no}">0</strong></div>
+      </div>`;
+    grid.appendChild(card);
+  }
+  updateMemberWorkloads();
+}
+
+function renderMemberFilter() {
+  const filter = document.getElementById("memberFilter");
+  const selected = filter.value || "all";
+  filter.innerHTML = '<option value="all">All members</option>' + members.map(member =>
+    `<option value="${member.member_no}">${escapeHtml(member.display_name)}</option>`
+  ).join("");
+  filter.value = members.some(member => String(member.member_no) === selected) ? selected : "all";
+}
+
+async function saveMembers() {
+  showError("");
+  const rows = Array.from(document.querySelectorAll(".member-card")).map(card => ({
+    member_no: Number(card.dataset.memberNo),
+    display_name: card.querySelector(".member-name").value.trim(),
+    auth_user_id: card.querySelector(".member-uid").value.trim() || null
+  }));
+  if (rows.some(row => !row.display_name)) {
+    showError("Every member needs a display name.");
+    return;
+  }
+  const assignedUids = rows.map(row => row.auth_user_id).filter(Boolean);
+  if (new Set(assignedUids).size !== assignedUids.length) {
+    showError("Each member must use a different Supabase Auth user.");
+    return;
+  }
+  const { error } = await supabaseClient.from("team_members")
+    .upsert(rows, { onConflict: "member_no" });
+  if (error) {
+    showError(`Could not save team settings: ${error.message}`);
+    return;
+  }
+  await loadTeam();
+  if (registrations.length) renderRegistrations();
+  showError("Team settings saved.");
+}
+
+async function fetchRegistrations() {
+  showError("");
+  document.getElementById("syncStatus").textContent = "Fetching registrations from Supabase…";
+  const fetchedRegistrations = [];
+  const pageSize = 500;
+  try {
+    for (let offset = 0; ; offset += pageSize) {
+      const { data, error } = await supabaseClient.from("registrations")
+        .select("id,registration_id,full_name,email,status,assigned_member_id,email_sent,email_sent_at,email_sent_by,email_sent_by_name")
+        .order("id", { ascending: true })
+        .range(offset, offset + pageSize - 1);
+      if (error) throw error;
+      fetchedRegistrations.push(...(data || []));
+      if (!data || data.length < pageSize) break;
+    }
+  } catch (error) {
+    document.getElementById("syncStatus").textContent = "Fetch failed.";
+    showError(`Could not fetch registrations: ${error.message}`);
+    return false;
+  }
+  registrations = fetchedRegistrations;
+  for (const row of registrations) {
+    if (row.email_sent && row.assigned_member_id) {
+      assignmentDraft[row.id] = row.assigned_member_id;
+    } else if (row.assigned_member_id && !assignmentDraft[row.id]) {
+      assignmentDraft[row.id] = row.assigned_member_id;
+    }
+  }
+  saveDraft();
+  document.getElementById("syncStatus").textContent = `Fetched ${registrations.length} registrations from Supabase at ${new Date().toLocaleString()}.`;
+  renderRegistrations();
+  renderStats();
+  return true;
+}
+
+function assignRoundRobin() {
+  if (!registrations.length) {
+    showError("Fetch registrations from Supabase before assigning.");
+    return;
+  }
+  if (members.length !== 6) {
+    showError("The six team-member rows are not loaded. Refresh and try again.");
+    return;
+  }
+  if (members.some(member => !member.auth_user_id)) {
+    showError("Link all six Supabase Auth user UIDs before assigning tasks.");
+    return;
+  }
+  registrations.forEach((row, index) => {
+    if (row.email_sent) {
+      assignmentDraft[row.id] = row.assigned_member_id;
+      return;
+    }
+    assignmentDraft[row.id] = members[index % members.length].member_no;
+  });
+  saveDraft();
+  renderRegistrations();
+  showError("");
+}
+
+function renderRegistrations() {
+  const container = document.getElementById("assignments");
+  container.innerHTML = "";
+  if (!registrations.length) {
+    document.getElementById("assignmentResultCount").textContent = "No registrations loaded.";
+    container.innerHTML = '<p class="small">No registrations fetched. Use “Fetch registrations” to load the current Supabase rows.</p>';
+    updateMemberWorkloads();
+    return;
+  }
+  const filterValue = document.getElementById("memberFilter").value || "all";
+  const filteredRegistrations = registrations.filter(row =>
+    filterValue === "all" || Number(assignmentDraft[row.id]) === Number(filterValue)
+  );
+  document.getElementById("assignmentResultCount").textContent =
+    `${filteredRegistrations.length} of ${registrations.length} registrations`;
+  updateMemberWorkloads();
+  if (!filteredRegistrations.length) {
+    container.innerHTML = '<p class="small">No registrations are assigned to this member.</p>';
+    renderStats();
+    return;
+  }
+  for (const row of filteredRegistrations) {
+    const item = document.createElement("div");
+    item.className = "registration";
+    const memberOptions = ['<option value="">Choose a member</option>', ...members.map(member =>
+      `<option value="${member.member_no}" ${Number(assignmentDraft[row.id]) === member.member_no ? "selected" : ""}>${escapeHtml(member.display_name)}</option>`
+    )].join("");
+    const sentBy = row.email_sent
+      ? row.email_sent_by_name
+        || members.find(member => member.auth_user_id === row.email_sent_by)?.display_name
+        || (row.email_sent_by ? "Admin / unlinked account" : "Not recorded")
+      : "";
+    const status = row.email_sent
+      ? `<span class="status-done">SENT</span><br><span class="small">Sent by ${escapeHtml(sentBy)}${row.email_sent_at ? ` · ${escapeHtml(new Date(row.email_sent_at).toLocaleString())}` : ""}</span>`
+      : '<span class="status-pending">PENDING</span>';
+    const assignmentLocked = Boolean(row.email_sent);
+    const assignedMember = members.find(member => member.member_no === Number(assignmentDraft[row.id]));
+    item.innerHTML = `<div><strong>#${escapeHtml(row.id)} — ${escapeHtml(row.full_name || "Unnamed delegate")}</strong>
+      <br><span class="small">${escapeHtml(row.email || "No email")}</span><div class="registration-status">${status}</div></div>
+      <div><label>${assignmentLocked ? "Sent task owner (locked)" : "Assigned member"}</label>
+      ${assignmentLocked
+        ? `<strong>${escapeHtml(assignedMember?.display_name || "Unassigned")}</strong>`
+        : `<select aria-label="Assign ${escapeHtml(row.full_name || row.id)}">${memberOptions}</select>`}</div>`;
+    if (!assignmentLocked) {
+      item.querySelector("select").addEventListener("change", event => {
+        assignmentDraft[row.id] = Number(event.target.value);
+        saveDraft();
+        renderRegistrations();
+      });
+    }
+    container.appendChild(item);
+  }
+  renderStats();
+}
+
+async function distribute() {
+  showError("");
+  if (!registrations.length) {
+    showError("Fetch registrations before distributing assignments.");
+    return;
+  }
+  if (members.length !== 6 || members.some(member => !member.auth_user_id)) {
+    showError("Link all six Supabase Auth user UIDs before distributing tasks.");
+    return;
+  }
+  const pendingRegistrations = registrations.filter(row => !row.email_sent);
+  const unassigned = pendingRegistrations.filter(row => !Number.isInteger(Number(assignmentDraft[row.id])) || Number(assignmentDraft[row.id]) < 1 || Number(assignmentDraft[row.id]) > 6);
+  if (unassigned.length) {
+    showError(`${unassigned.length} registration(s) do not have a valid member assignment.`);
+    return;
+  }
+  if (!pendingRegistrations.length) {
+    showError("All fetched registrations are already marked sent; no assignments can be changed.");
+    return;
+  }
+  if (!confirm(`Distribute ${pendingRegistrations.length} pending assignments? Sent registrations will stay with their original member.`)) return;
+  const button = document.getElementById("distributeButton");
+  button.disabled = true;
+  button.textContent = "Distributing…";
+  try {
+    for (const member of members) {
+      const ids = pendingRegistrations.filter(row => Number(assignmentDraft[row.id]) === member.member_no).map(row => row.id);
+      for (let offset = 0; offset < ids.length; offset += 100) {
+        const batch = ids.slice(offset, offset + 100);
+        const { data, error } = await supabaseClient.from("registrations")
+          .update({ assigned_member_id: member.member_no }).in("id", batch).select("id");
+        if (error) throw new Error(error.message);
+        if ((data || []).length !== batch.length) {
+          throw new Error("Supabase did not confirm every row in a batch. Refresh and verify assignments before retrying.");
+        }
+      }
+    }
+    const refreshed = await fetchRegistrations();
+    if (!refreshed) {
+      document.getElementById("syncStatus").textContent =
+        `Supabase accepted ${pendingRegistrations.length} assignment updates, but the verification fetch failed. Fetch again to confirm saved assignments.`;
+      return;
+    }
+    const sentCount = registrations.filter(row => row.email_sent).length;
+    const memberSummary = members.map(member => {
+      const assigned = registrations.filter(row => row.assigned_member_id === member.member_no);
+      const sent = assigned.filter(row => row.email_sent).length;
+      return `${member.display_name}: ${assigned.length - sent} pending, ${sent} sent`;
+    }).join(" · ");
+    document.getElementById("syncStatus").textContent =
+      `Distribution verified: ${pendingRegistrations.length} pending registrations updated; ${sentCount} sent registrations remain locked. ${memberSummary}`;
+  } catch (error) {
+    showError(`Distribution stopped: ${error.message}`);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Distribute to Supabase";
+  }
+}
+
+function renderStats() {
+  document.getElementById("totalUsers").textContent = registrations.length;
+  const done = registrations.filter(row => row.email_sent).length;
+  document.getElementById("totalDone").textContent = done;
+  document.getElementById("totalPending").textContent = registrations.length - done;
+}
+
+function updateMemberWorkloads() {
+  for (const member of members) {
+    const assigned = registrations.filter(row => row.assigned_member_id === member.member_no);
+    const done = assigned.filter(row => row.email_sent).length;
+    const doneElement = document.querySelector(`[data-workload-done="${member.member_no}"]`);
+    const pendingElement = document.querySelector(`[data-workload-pending="${member.member_no}"]`);
+    if (doneElement) doneElement.textContent = registrations.length ? done : "—";
+    if (pendingElement) pendingElement.textContent = registrations.length ? assigned.length - done : "—";
+  }
+}
+
+async function renderDashboardStats() {
+  const { count, error } = await supabaseClient.from("registrations")
+    .select("id", { count: "exact", head: true });
+  if (error) throw new Error(`Could not check admin access to registrations: ${error.message}`);
+  document.getElementById("totalUsers").textContent = count ?? 0;
+  document.getElementById("syncStatus").textContent = "Admin access confirmed. Fetch registrations to begin or refresh.";
+}
+
+async function refreshDashboard() {
+  showError("");
+  try {
+    await loadTeam();
+    if (registrations.length) await fetchRegistrations();
+    else await renderDashboardStats();
+  } catch (error) {
+    showError(error.message);
+  }
+}
+
+async function logout() {
+  const { error } = await supabaseClient.auth.signOut();
+  if (error) {
+    showError(`Could not sign out: ${error.message}`);
+    return;
+  }
+  localStorage.removeItem(DRAFT_STORAGE_KEY);
+  registrations = [];
+  members = [];
+  assignmentDraft = {};
+  document.getElementById("dashboard").classList.add("hidden");
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.getElementById("adminPassword").value = "";
+}
+
+document.getElementById("loginForm").addEventListener("submit", login);
+document.getElementById("fetchButton").addEventListener("click", fetchRegistrations);
+document.getElementById("assignButton").addEventListener("click", assignRoundRobin);
+document.getElementById("distributeButton").addEventListener("click", distribute);
+document.getElementById("saveMembersButton").addEventListener("click", saveMembers);
+document.getElementById("refreshButton").addEventListener("click", refreshDashboard);
+document.getElementById("logoutButton").addEventListener("click", logout);
+document.getElementById("memberFilter").addEventListener("change", renderRegistrations);
+
+if (clientReady()) {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false
+    }
+  });
+  supabaseClient.auth.getSession().then(async ({ data, error }) => {
+    if (error) {
+      document.getElementById("loginError").textContent = error.message;
+      return;
+    }
+    if (!data.session?.user) return;
+    try {
+      await showDashboard(data.session.user);
+    } catch (adminError) {
+      await supabaseClient.auth.signOut();
+      document.getElementById("loginError").textContent = adminError.message;
+    }
+  });
+}
+</script>
+</body>
+</html>
