@@ -5,52 +5,435 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AMUN Member Tasks</title>
 <style>
-:root{color-scheme:light;--bg:#f3f6fb;--surface:#fff;--ink:#17243a;--muted:#718096;--line:#e3e9f2;--blue:#315fe8;--green:#138a62;--amber:#a86308}
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 88% 0%,#e3ebff 0,transparent 35%),var(--bg);color:var(--ink);line-height:1.55}
-button,input,textarea{font:inherit}
-header{position:relative;overflow:hidden;background:linear-gradient(115deg,#101d38,#1d3564);color:#fff;padding:25px max(24px,calc((100vw - 1100px)/2))}
-header:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;right:12%;top:-170px;background:#749aff22}
-header h1{position:relative;z-index:1;margin:0;font-size:25px;letter-spacing:-.035em}
-header p{position:relative;z-index:1;margin:5px 0 0;color:#b9c8e2;font-size:14px}
-.container{width:min(1100px,100%);margin:30px auto;padding:0 22px}
-.card{background:var(--surface);border:1px solid #e8edf4;border-radius:17px;padding:25px;box-shadow:0 12px 34px #1d315012;margin-bottom:20px}
-.login-box{max-width:440px;margin:9vh auto;padding:32px}
-h2{margin:0 0 8px;font-size:21px;letter-spacing:-.025em}p{margin:8px 0 15px}
-.small{color:var(--muted);font-size:13px}
-input,textarea{width:100%;padding:12px 14px;margin:7px 0;border:1px solid #d9e1ec;border-radius:10px;background:#fff;color:var(--ink);font-size:15px;transition:border-color .15s ease,box-shadow .15s ease}
-input::placeholder{color:#9aa7b8}input:focus,textarea:focus{outline:0;border-color:#6e91f4;box-shadow:0 0 0 4px #315fe81c}
-button{border:1px solid transparent;padding:10px 15px;border-radius:10px;cursor:pointer;font-weight:650;transition:transform .16s ease,background .16s ease,box-shadow .16s ease}
-button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 16px #132a501c}
-button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #315fe850;outline-offset:2px}
-button:disabled{opacity:.55;cursor:not-allowed}
-.primary{background:var(--blue);color:#fff}.primary:hover:not(:disabled){background:#244fd0}
-.success{background:var(--green);color:#fff}.success:hover:not(:disabled){background:#0d7452}
-.secondary{background:#eef2f8;color:#273650;border-color:#e1e7f0}.secondary:hover:not(:disabled){background:#e3eaf5}
-.login-button{width:100%;margin-top:12px;padding:12px}
-.error{color:#c53c45;margin-top:12px}.hidden{display:none!important}
-.top-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:20px}
-.stat{min-width:0;background:linear-gradient(145deg,#f8faff,#f2f6fd);border:1px solid #e7edf7;border-radius:14px;padding:16px 18px;color:#66758c;font-size:13px;font-weight:650}
-.stat strong{display:block;font-size:29px;line-height:1.2;letter-spacing:-.04em;margin-top:6px;color:#24395f}
-#pendingCount{color:var(--amber)}#doneCount{color:var(--green)}
-.task-list{display:grid;gap:11px;margin-top:14px}
-.task{border:1px solid var(--line);border-radius:13px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:15px;transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
-.task:hover{border-color:#c8d5ef;box-shadow:0 7px 20px #1d31500c;transform:translateY(-1px)}
-.task.done{background:#f6fcf9;border-color:#d8eee4}.task-name{font-weight:700;font-size:16px;letter-spacing:-.015em}.task-email{color:var(--muted);font-size:13px;margin-top:3px;word-break:break-word}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;font-size:11px;letter-spacing:.04em;font-weight:750;margin-top:8px}
-.badge:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.pending{background:#fff4dc;color:#96600a}.done-badge{background:#e4f7ed;color:#14734e}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
-.modal{position:fixed;inset:0;z-index:5;background:#0b1736a6;backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:20px}
-.modal-content{background:#fff;width:min(740px,100%);max-height:90vh;overflow-y:auto;border:1px solid #e3e9f2;border-radius:18px;padding:27px;box-shadow:0 24px 80px #07142b55}
-textarea{min-height:260px;resize:vertical;font-family:inherit;line-height:1.6}
-.field-label{font-size:12px;font-weight:750;color:#52627a;margin-top:14px;display:block}
-.details{background:#f5f8fd;border:1px solid #e7edf6;border-radius:12px;padding:15px;margin:16px 0}
-.details strong{color:#52627a;font-size:13px}.details span{font-size:14px}
-.button-row{display:flex;gap:9px;margin-top:15px;flex-wrap:wrap}
-@media(max-width:640px){header{padding:21px 20px}.container{padding:0 15px;margin:22px auto}.card{padding:19px;border-radius:14px}.login-box{padding:24px;margin:7vh auto}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:24px}.task{align-items:flex-start;padding:14px;flex-direction:column}.actions,.actions button{width:100%}.button-row button{flex:1 1 100%}.modal-content{padding:21px}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+:root {
+  --bg: #eef4ff;
+  --bg-strong: #e9f1ff;
+  --surface: rgba(255,255,255,0.9);
+  --surface-strong: #ffffff;
+  --ink: #12243f;
+  --muted: #63789a;
+  --line: #dfe8f7;
+  --blue: #2d5af5;
+  --blue-strong: #1e45d7;
+  --green: #1e9c63;
+  --green-strong: #126a48;
+  --amber: #b47511;
+  --amber-soft: #fff3d5;
+  --shadow: 0 24px 70px rgba(18,36,63,0.14);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top right, rgba(79,120,255,0.18), transparent 30%),
+    linear-gradient(180deg, #f5f8ff 0%, var(--bg) 100%);
+  color: var(--ink);
+  line-height: 1.55;
+}
+button, input, textarea { font: inherit; }
+a { color: inherit; }
+
+header {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0d1d37 0%, #0f274d 40%, #1d3d7a 100%);
+  color: #fff;
+  padding: 26px max(24px, calc((100vw - 1180px) / 2));
+}
+header::before {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: 7%;
+  top: -180px;
+  border-radius: 50%;
+  background: rgba(127, 165, 255, 0.18);
+}
+header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), transparent 55%);
+}
+header > * {
+  position: relative;
+  z-index: 1;
+}
+header h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 2vw, 2.3rem);
+  letter-spacing: -0.06em;
+}
+header p {
+  margin: 6px 0 0;
+  color: rgba(227,235,255,0.8);
+  font-size: 0.95rem;
+}
+
+.container {
+  width: min(1160px, 100%);
+  margin: 30px auto;
+  padding: 0 22px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.pill-group {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px;
+  background: rgba(11, 31, 59, 0.04);
+  border: 1px solid rgba(18,36,63,0.06);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+.pill-group button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.pill-group button.active {
+  background: linear-gradient(135deg, #ffffff, #ebf1ff);
+  color: var(--ink);
+  box-shadow: 0 8px 18px rgba(32, 67, 136, 0.12);
+}
+
+.card {
+  background: var(--surface);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(216,225,243,0.9);
+  border-radius: 22px;
+  padding: 26px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.login-box {
+  max-width: 470px;
+  margin: 9vh auto;
+  padding: 34px 30px;
+}
+
+h2 {
+  margin: 0 0 8px;
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  letter-spacing: -0.05em;
+}
+
+p {
+  margin: 8px 0 15px;
+  color: var(--muted);
+}
+
+.small { color: var(--muted); font-size: 0.8rem; }
+
+input, textarea {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 9px 0 5px;
+  border: 1px solid #d6dfef;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.9);
+  color: var(--ink);
+  font-size: 0.98rem;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+input::placeholder { color: #8aa0bd; }
+input:focus, textarea:focus {
+  outline: none;
+  border-color: rgba(45,90,245,0.7);
+  box-shadow: 0 0 0 4px rgba(45,90,245,0.12);
+}
+
+button {
+  border: 1px solid transparent;
+  padding: 11px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, opacity 0.16s ease;
+}
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(20,40,76,0.12);
+}
+button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 3px solid rgba(45,90,245,0.22);
+  outline-offset: 2px;
+}
+button:disabled {
+  opacity: 0.56;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.primary { background: linear-gradient(135deg, var(--blue), var(--blue-strong)); color: #fff; }
+.primary:hover:not(:disabled) { background: linear-gradient(135deg, #244de3, #163fd0); }
+.success { background: linear-gradient(135deg, var(--green), var(--green-strong)); color: #fff; }
+.success:hover:not(:disabled) { background: linear-gradient(135deg, #117a53, #0e6543); }
+.secondary {
+  background: linear-gradient(135deg, #edf3ff, #f2f5fb);
+  color: var(--ink);
+  border-color: var(--line);
+}
+.secondary:hover:not(:disabled) { background: linear-gradient(135deg, #eaf1ff, #edf3fb); }
+
+.login-button { width: 100%; margin-top: 12px; padding: 13px 16px; }
+
+.error {
+  color: #be3e4d;
+  margin-top: 12px;
+  min-height: 20px;
+  font-weight: 600;
+}
+
+.hidden { display: none !important; }
+
+.top-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.stat {
+  background: linear-gradient(180deg, #f8fbff, #f3f7ff);
+  border: 1px solid #e5edf9;
+  border-radius: 16px;
+  padding: 18px 18px 16px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.stat strong {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  letter-spacing: -0.06em;
+  color: var(--ink);
+  line-height: 1.1;
+}
+#pendingCount { color: var(--amber); }
+#doneCount { color: var(--green); }
+
+.task-list, .developer-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.task, .developer-item {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,0.8);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+.task:hover, .developer-item:hover {
+  border-color: #bfd0f7;
+  box-shadow: 0 12px 26px rgba(22,40,76,0.08);
+  transform: translateY(-1px);
+}
+.task.done { background: linear-gradient(180deg, #f4fbf7, #f2fff8); border-color: #cfead8; }
+.task-name, .developer-name {
+  font-weight: 800;
+  font-size: 1.03rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.task-email, .developer-meta {
+  color: var(--muted);
+  font-size: 0.84rem;
+  margin-top: 4px;
+  word-break: break-word;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  font-weight: 750;
+  margin-top: 10px;
+}
+.badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.pending {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+.done-badge {
+  background: #e3f7ee;
+  color: var(--green);
+}
+
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(11, 21, 38, 0.66);
+  backdrop-filter: blur(8px);
+}
+
+.modal-content {
+  background: #fff;
+  width: min(760px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+  border-radius: 22px;
+  padding: 27px;
+  border: 1px solid rgba(224,232,245,0.9);
+  box-shadow: 0 30px 80px rgba(6,17,32,0.35);
+}
+
+textarea {
+  min-height: 240px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.field-label {
+  display: block;
+  margin-top: 16px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.details {
+  background: linear-gradient(180deg, #f3f7ff, #f7f9ff);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin: 14px 0 8px;
+}
+.details strong { color: var(--muted); font-size: 0.8rem; }
+.details span { font-size: 0.95rem; }
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.summary-card {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fbfcff, #f3f6ff);
+}
+.summary-card small {
+  display: block;
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.summary-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  letter-spacing: -0.05em;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+}
+th, td {
+  text-align: left;
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 820px) {
+  .stats, .summary-grid { grid-template-columns: 1fr 1fr; }
+  .task, .developer-item { flex-direction: column; align-items: flex-start; }
+  .actions, .actions button { width: 100%; }
+}
+
+@media (max-width: 640px) {
+  header { padding: 22px 18px; }
+  .container { padding: 0 14px; margin: 22px auto; }
+  .card { padding: 18px; border-radius: 16px; }
+  .login-box { margin: 5vh auto; padding: 24px 19px; }
+  .topbar { align-items: stretch; }
+  .pill-group { width: 100%; }
+  .pill-group button { flex: 1; }
+  .stats, .summary-grid { grid-template-columns: 1fr; }
+  .task, .developer-item { padding: 14px; }
+  .button-row button { flex: 1 1 100%; }
+  .modal-content { padding: 20px 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -70,8 +453,14 @@ textarea{min-height:260px;resize:vertical;font-family:inherit;line-height:1.6}
 </div>
 
 <main id="appScreen" class="container hidden">
-  <section class="card">
-    <div class="top-row"><h2 id="memberName">Member</h2><button class="secondary" id="logoutButton">Sign out</button></div>
+  <div class="topbar">
+    <div class="top-row" style="width:100%; justify-content:space-between;">
+      <h2 id="memberName" style="margin:0;">Member</h2>
+      <button class="secondary" id="logoutButton" type="button">Sign out</button>
+    </div>
+  </div>
+
+  <section id="memberSection" class="card">
     <p>Your assigned delegates are shown below. Only tasks assigned to your member account are visible.</p>
     <div class="stats">
       <div class="stat">Total<strong id="totalCount">0</strong></div>
@@ -79,8 +468,9 @@ textarea{min-height:260px;resize:vertical;font-family:inherit;line-height:1.6}
       <div class="stat">Done<strong id="doneCount">0</strong></div>
     </div>
   </section>
-  <section class="card">
-    <div class="top-row"><h2>My Tasks</h2><button class="secondary" id="refreshButton">Refresh</button></div>
+
+  <section id="memberSectionTasks" class="card">
+    <div class="top-row"><h2>My Tasks</h2><button class="secondary" id="refreshButton" type="button">Refresh</button></div>
     <div id="taskList" class="task-list"></div>
     <div id="taskError" class="error" role="alert"></div>
   </section>
@@ -95,9 +485,9 @@ textarea{min-height:260px;resize:vertical;font-family:inherit;line-height:1.6}
     <label class="field-label" for="emailBody">Email Body</label>
     <textarea id="emailBody"></textarea>
     <div class="button-row">
-      <button class="primary" id="composeButton">Compose in Gmail</button>
-      <button class="success" id="markSentButton">I have sent this email</button>
-      <button class="secondary" id="cancelButton">Cancel</button>
+      <button class="primary" id="composeButton" type="button">Compose in Gmail</button>
+      <button class="success" id="markSentButton" type="button">I have sent this email</button>
+      <button class="secondary" id="cancelButton" type="button">Cancel</button>
     </div>
     <p class="small">Gmail opens a draft for you to review and send. Mark it sent only after you have sent it.</p>
   </div>
@@ -130,7 +520,8 @@ let currentTasks = [];
 let currentTask = null;
 
 function showError(elementId, message) {
-  document.getElementById(elementId).textContent = message || "";
+  const target = document.getElementById(elementId);
+  if (target) target.textContent = message || "";
 }
 
 function escapeHtml(value) {
@@ -241,20 +632,51 @@ function openTask(id) {
   document.getElementById("emailModal").classList.remove("hidden");
 }
 
+function buildGmailComposeUrl({ to, subject, body }) {
+  const params = new URLSearchParams({
+    view: "cm",
+    fs: "1",
+    to: to || "",
+    su: subject || "",
+    body: body || "",
+    tf: "1"
+  });
+  return `https://mail.google.com/mail/?${params.toString()}`;
+}
+
 function openGmail() {
   if (!currentTask) return;
   if (!currentTask.email) {
     alert("This registration does not contain an email address.");
     return;
   }
-  const params = new URLSearchParams({
-    view: "cm",
-    fs: "1",
+
+  const subject = document.getElementById("emailSubject").value.trim();
+  const body = document.getElementById("emailBody").value.trim();
+  const gmailWebUrl = buildGmailComposeUrl({
     to: currentTask.email,
-    su: document.getElementById("emailSubject").value,
-    body: document.getElementById("emailBody").value
+    subject,
+    body
   });
-  window.open(`https://mail.google.com/mail/?${params}`, "_blank", "noopener");
+
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+  if (isMobile) {
+    const gmailAppUrl = `googlegmail://co?to=${encodeURIComponent(currentTask.email)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const anchor = document.createElement("a");
+    anchor.href = gmailAppUrl;
+    anchor.style.display = "none";
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+
+    window.setTimeout(() => {
+      window.location.href = gmailWebUrl;
+    }, 700);
+    return;
+  }
+
+  window.open(gmailWebUrl, "_blank", "noopener,noreferrer");
 }
 
 async function markCurrentDone() {
