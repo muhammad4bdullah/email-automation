@@ -197,6 +197,17 @@ button:disabled {
 .secondary:hover:not(:disabled) { background: linear-gradient(135deg, #eaf1ff, #edf3fb); }
 
 .login-button { width: 100%; margin-top: 12px; padding: 13px 16px; }
+.admin-link {
+  display: block;
+  width: fit-content;
+  margin: 18px auto 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: color 0.16s ease;
+}
+.admin-link:hover { color: var(--blue); text-decoration: underline; }
 
 .error {
   color: #be3e4d;
@@ -449,6 +460,7 @@ th {
       <button class="primary login-button" type="submit">Login</button>
     </form>
     <div id="loginError" class="error" role="alert"></div>
+    <a class="admin-link" href="developer24.html">Developer or admin? Open Developer 24</a>
   </div>
 </div>
 
